@@ -13,8 +13,8 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...          
       - docker-compose build
-      - docker tag ecs-codepipeline_web:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:web
-      - docker tag ecs-codepipeline_app:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:app
+      - docker tag ecs-pipeline_web:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:web
+      - docker tag ecs-pipeline_app:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:app
   post_build:
     commands:
       - echo Build completed on `date`
