@@ -4,7 +4,9 @@ services:
     build:
       context: .
       dockerfile: ./docker/web/Dockerfile
+    image: ecs-pipeline_web:latest
   app:
     build:
       context: .
       dockerfile: ./docker/app/Dockerfile
+    image: ecs-pipeline_app:latest
