@@ -13,11 +13,11 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...          
       - docker-compose build
-      - docker tag ecs-pipeline_web:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:web
-      - docker tag ecs-pipeline_app:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:app
+      - docker tag ecs-pipeline_web:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web
+      - docker tag ecs-pipeline_app:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:web
-      - docker push 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:app
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app
