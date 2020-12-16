@@ -72,10 +72,21 @@ ECS Cluster作成
 　　　DB_＿_PASSWORD
 　作成
 
+そのまま、アクション→サービス作成
 
-デベロッパー用ツール > CodePipeline > パイプライン > パイプラインを作成する
+　起動タイプ　EC2
+　サービス名　larave-app-ecs
+　REPLICA、タスクの数１
+　ローリング
+　作成
 
-名　ecs-pipeline-3stage
+タスクからインスタンスのIPアドレスをチェックし
+まずはアクセスしてLaravel画面が出るのを見る
 
-ソース
-Git2、ecs-pipeline-3stage接続する、アプリ選択して接続
+PIPELINEの作成
+
+前に作っているecs-pipelineを選択する
+
+ステージ追加、Deploy
+アクショングループ追加　Deploy、プロバイダーECS、アジア、アーティファクトはBuild、クラスター・サービス選択、イメージ定義ファイル　imagedefinitions.json　で完了し保存
+
