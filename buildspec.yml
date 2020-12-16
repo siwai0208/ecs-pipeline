@@ -21,3 +21,8 @@ phases:
       - echo Pushing the Docker image...
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app
+      - echo Writing image definitions file...
+      - printf '[{"name":"web","imageUri":"%s"}]' ${IMAGE_REPO_NAME}:web > imagedefinitions.json
+      - printf '[{"name":"app","imageUri":"%s"}]' ${IMAGE_REPO_NAME}:app > imagedefinitions.json
+artifacts:
+    files: imagedefinitions.json
