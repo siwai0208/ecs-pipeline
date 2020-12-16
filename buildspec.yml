@@ -22,12 +22,12 @@ phases:
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app
       - echo Writing image definitions file...
-      - cat <<__JSON__ > imagedefinitions.json
+      - cat <<EOF > imagedefinitions.json
         [
-          {"name":"web", "imageUri":"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web"},
-          {"name":"app", "imageUri":"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app"}
+          {"name":"web", "imageUri":"551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:web"},
+          {"name":"app", "imageUri":"551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:app"}
         ]
-        __JSON__
+        EOF
 
 artifacts:
     files: imagedefinitions.json
