@@ -1,8 +1,5 @@
-RDS用意できている
-　DB_HOST RDSエンドポイント 
-  DB_NAME laravel
-　DB_USERNAME RDSユーザー名
-　DB_PASSWORD RDSパスワード 
+
+No1.Codebuild編=====
 
 git clone する
 docker-compse build
@@ -33,33 +30,52 @@ Cluster
  　サブネット（パブリック）
  　SecurityGroup
 
+No2.CodePipelineでDeployまで=====
+
+RDS用意できている
+　DB_HOST RDSエンドポイント 
+  DB_NAME laravel
+　DB_USERNAME RDSユーザー名
+　DB_PASSWORD RDSパスワード 
+
+ECS Cluster作成
+　EC2 Linux + ネットワーキング
+　ecs-pipeline-cluster
+　ｔ２，２台
+　キー：オプション
+　サブネット：Pub1
+　セキュリティ：いつもの
+　作成
+
+　ECSインスタンスが2台あがっていること
+
 タスク定義
 　新しいタスク定義
-　　EC2
-　　name　ecs-task
-　　role　ecsTaskExecute
-　　コンテナ追加
-　　　web
+　EC2を選択
+　ecs-pipeline-task
+  ecsTaskExecutionRole
+  ネットワークdefault
+  タスク定義
+　新しいタスク定義
+　コンテナ追加
+　　web
 　　　イメージ　551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:web
 　　　memory 300
 　　　ポート 80:80/tcp
 　　　リンク app:app
-　　　app
+　　app
 　　　イメージ　551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:app
 　　　memory 600
 　　　環境変数
 　　　DB_HOST
+　　　DB_NAME
+　　　DB_＿_PASSWORD
 　作成
 
 
-アクション、タスク実行　php, artisan, migrate
-アクション、タスク実行　php, artisan, db:seed
-アクション
-　サービスの作成
-　　EC2
-　　サービス名　laravel-sample-app
-　　タスク数　1
-　　AZバランス
-　作成
+デベロッパー用ツール > CodePipeline > パイプライン > パイプラインを作成する
 
+名　ecs-pipeline-3stage
 
+ソース
+Git2、ecs-pipeline-3stage接続する、アプリ選択して接続
