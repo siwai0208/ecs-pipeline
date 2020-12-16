@@ -22,7 +22,12 @@ phases:
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app
       - echo Writing image definitions file...
-      - echo '[{"name":"web","imageUri":"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web"}]' > imagedefinitions.json
-      - echo '[{"name":"app","imageUri":"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app"}]' >> imagedefinitions.json
+      - cat <<__JSON__ > imagedefinitions.json
+        [
+          {"name":"web", "imageUri":"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:web"},
+          {"name":"app", "imageUri":"${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:app"}
+        ]
+        __JSON__
+
 artifacts:
     files: imagedefinitions.json
