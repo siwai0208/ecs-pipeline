@@ -78,7 +78,7 @@ Cloudformation で RDSを作成
 <br>メモリ制限 (MiB)*　ハード制限・600
 <br>
 <br>環境
-<br>環境変数でRDS接続パラメータを設定
+<br>環境変数　以下のRDS接続パラメータを設定
 <br>DB_HOST　Value　RDSのエンドポイントをコピペ
 <br>DB_NAME　Value　RDSで作成したデータベース名
 <br>DB_USER　Value　RDSで作成したユーザー名
@@ -134,4 +134,17 @@ artifacts:
     files: imagedefinitions.json
 ```
 
-* 変更をGitにPUSHし、CodePipelineが動作することを確認
+* 変更をGitにPUSHし、Soucrce->Build->Deployの3段階でCodePipelineが動作することを確認
+
+
+* アプリへのアクセス
+<br>
+<br>クラスター > ecs-cluster の詳細画面を表示
+<br>タスク タブで実行中のコンテナインスタンスを選択
+<br>パブリックIPを確認しブラウザでアクセス -> Laravelアプリが表示されること
+
+* 初回のDB Migration
+<br>
+<br>クラスターにSSHアクセスし、docker exec -it <CONTAINER ID> bash
+<br>php artisan migrate
+
