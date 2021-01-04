@@ -1,92 +1,125 @@
+# **Docker-ECR-Codebuild**
 
-No1.Codebuild編=====
+## **About**
 
-git clone する
-docker-compse build
-docker imagesで　ecs-webとecs-appのlatestを見る
+gitレポジトリーの変更をトリガーにECRへのPUSH、およびCodebuildをする
 
-ECR作成
+## **Inside Package**
+ * web nginx:alpine
+ * app php
+ * DBはAWSのRDSを使用
 
-マネコンでプッシュコマンドの表示
-aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com
-＞Login Succeeded
+## **手順**
 
-tagづけ
-docker tag ecs_web:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:web
-docker tag ecs_app:latest 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:app
+### **1. ECRレポジトリの作成**
 
-upload
-docker push 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:web
-docker push 551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:app
+* AWSマネコンで　ECR > リポジトリ > リポジトリを作成
+```
+ 可視性設定　プライベート
+ リポジトリ名　Laravel-app-ecs(例)
+ リポジトリを作成
+```
 
-upload完了
+### **2. 「プッシュコマンドの表示」をクリックし、ポップアップの内容に従いローカルターミナルで以下**
 
-Cluster
- EC2 linux ネットワーキング 
- 名　ecs-cluster
- t2.micro
- KEY ec-app（オプション）
- 　VPC
- 　サブネット（パブリック）
- 　SecurityGroup
+* Docker クライアントを認証
+```
+aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com
+...
 
-No2.CodePipelineでDeployまで=====
+Login Succeeded　←成功
+```
 
-RDS用意できている
-　DB_HOST RDSエンドポイント 
-  DB_NAME laravel
-　DB_USERNAME RDSユーザー名
-　DB_PASSWORD RDSパスワード 
+* イメージを構築
+```
+docker-compose build
+```
 
-ECS Cluster作成
-　EC2 Linux + ネットワーキング
-　ecs-pipeline-cluster
-　ｔ２，２台
-　キー：オプション
-　サブネット：Pub1
-　セキュリティ：いつもの
-　作成
+* イメージにタグ付け
+docker images コマンドで ecs-pipeline__webと、ecs-pipeline__appの2つがビルドされていることを確認し、それぞれのイメージにタグ付けをする
 
-　ECSインスタンスが2台あがっていること
+```
+docker images
+ REPOSITORY        TAG 
+ ecs-pipeline_web  latest
+ ecs-pipeline_app  latest
 
-タスク定義
-　新しいタスク定義
-　EC2を選択
-　ecs-pipeline-task
-  ecsTaskExecutionRole
-  ネットワークdefault
-  タスク定義
-　新しいタスク定義
-　コンテナ追加
-　　web
-　　　イメージ　551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:web
-　　　memory 300
-　　　ポート 80:80/tcp
-　　　リンク app:app
-　　app
-　　　イメージ　551419436295.dkr.ecr.ap-northeast-1.amazonaws.com/ecs:app
-　　　memory 600
-　　　環境変数
-　　　DB_HOST
-　　　DB_NAME
-　　　DB_＿_PASSWORD
-　作成
+docker tag ecs-pipeline_web:latest xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:web
+docker tag ecs-pipeline_app:latest xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:app
+```
 
-そのまま、アクション→サービス作成
+* イメージをECRリポジトリにPUSH
 
-　起動タイプ　EC2
-　サービス名　larave-app-ecs
-　REPLICA、タスクの数１
-　ローリング
-　作成
+```
+docker push xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:web
+docker push xxxxxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/laravel-app-ecs:app
+```
 
-タスクからインスタンスのIPアドレスをチェックし
-まずはアクセスしてLaravel画面が出るのを見る
+* 確認
+<br>AWSマネコンで ECR > リポジトリ > laravel-app-ecs（例）でweb, appの2つのイメージが保存されていることを確認する
 
-PIPELINEの作成
 
-前に作っているecs-pipelineを選択する
+### 3. CodeBuildの作成
 
-ステージ追加、Deploy
-アクショングループ追加　Deploy、プロバイダーECS、アジア、アーティファクトはBuild、クラスター・サービス選択、イメージ定義ファイル　imagedefinitions.json　で完了し保存
+* AWSマネコンで　デベロッパー用ツール > CodeBuild > ビルドプロジェクト > ビルドプロジェクトを作成
+```
+プロジェクトの設定
+  プロジェクト名　laravel-app-ecs-build（例）
 
+ソース
+  ソースプロバイダ　Github
+  リポジトリ　OAuth を使用して接続する　を選択
+  Githubに接続　をクリック
+  ポップアップで　確認　を選択
+  GitHub リポジトリ　https://github.com/siwai0208/ecs-pipeline.git　を選択
+
+環境
+  環境イメージ　マネージド型イメージ
+  オペレーティングシステム　Amazon Linux 2
+  ランタイム　Standard
+  イメージ　aws/codebuild/amazonlinux2-x86-64-standard:3.0
+  特権付与　有効化する
+  サービスロール　新しいサービスロールを選択
+  追加設定　環境変数に以下の値を追加
+    AWS_ACCOUNT_ID
+    AWS_DEFAULT_REGION
+    DOCKERHUB_USER
+    DOCKERHUB_PASS
+    IMAGE_REPO_NAME
+
+ビルドプロジェクトを作成する
+```
+
+### 4. CodePieplineの作成
+
+* AWSマネコンで　デベロッパー用ツール > CodePipeline > パイプライン > パイプラインを作成する
+```
+パイプラインの設定
+  パイプライン名　laravel-app-ecs-pipeline（例）
+  高度な設定　laravel-app-image（例）
+
+ソースステージを追加する
+  ソースプロバイダー　Github(バージョン2)
+  接続　Githubに接続する
+  接続名　food-app-ecs-pipeline
+  GitHub アプリ　「3. CodeBuildの作成」で作成したアプリを選択し接続
+  リポジトリ名　siwai0208/ecs-pipeline
+  ブランチ名　main
+
+ビルドステージを追加する
+  プロバイダーを構築する　AWS CodeBuild
+  プロジェクト名　laravel-app-ecs-build（3. CodeBuildの作成で作成）
+  次に
+
+デプロイ
+  導入段階をスキップ
+  パイプラインを作成する
+```
+
+### 5. CodePipelineのテスト
+
+* パイプラインを作成後、自動でソースチェック→BuildがスタートするがBuildフェーズで失敗となる。
+
+* AWSマネコン　IAM > ロール で「3. CodeBuildの作成」で作成した新しいサービスロールを選択し「AmazonEC2ContainerRegistryFullAccess」「AmazonS3FullAccess」をポリシーをアタッチ
+
+* Codepipelineに戻り、Buildを再試行
