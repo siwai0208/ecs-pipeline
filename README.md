@@ -141,6 +141,10 @@
 <br>実行中のコンテナインスタンスを選択 -> パブリックIPを確認しブラウザでアクセス -> アプリが表示されること
 
 * 初回のDB Migration
-  クラスターにSSHアクセスし、docker exec -it <CONTAINER ID> bash
-  php artisan migrate
-  php artisan db:seed
+<br>コンテナ実行中のインスタンスにSSHアクセスし、
+```
+ $ docker ps #appコンテナIDを確認
+ $ docker exec -it <CONTAINER ID> bash
+ $ php artisan migrate
+ $ php artisan db:seed
+```
