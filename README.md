@@ -133,12 +133,12 @@
 
 ### 4. GitPushからの動作テスト
 
-* 何かしらGitでPUSHし、Soucrce->Build->Deployの3段階でCodePipelineが動作することを確認
+* 何かしらGitPushしSoucrce->Build->Deployの3段階でCodePipelineが成功することを確認
 
 * アプリへのアクセス
   クラスター > ecs-cluster の詳細画面を表示
-  タスク タブで実行中のコンテナインスタンスを選択
-  パブリックIPを確認しブラウザでアクセス -> Laravelアプリが表示されること
+<br>タスクタブ > タスク定義のリビジョンが更新されている
+<br>実行中のコンテナインスタンスを選択 -> パブリックIPを確認しブラウザでアクセス -> アプリが表示されること
 
 * 初回のDB Migration
   クラスターにSSHアクセスし、docker exec -it <CONTAINER ID> bash
